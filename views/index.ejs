@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Index Bro</title>
+    <link href="processed.css" rel="stylesheet" />
+  </head>
+  <body class="p-4 m-10">
+    <ul>
+      <% files.forEach(function(file) { %>
+        <li class="bg-amber-500"><a href="<%= file %>"><%= file %></a></li>
+      <% }); %>
+    </ul>
+   </body>
+</html>
