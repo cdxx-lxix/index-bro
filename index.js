@@ -1,23 +1,62 @@
-const config = require("./config.json");
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
-const cors = require("cors")
+import config from "./config.json" assert { type: "json" };
+import express from "express";
+import { readdir } from "fs";
+import { join, dirname } from "path";
+import cors from "cors";
+import { fileTypeFromBuffer } from "file-type";
+import { readChunk } from "read-chunk";
 
 const app = express();
-app.use(cors())
+app.use(cors());
 app.set("view engine", "ejs");
-app.use(express.static(path.join(__dirname, 'styles'))); // CSS won't work without that
-app.use(express.static(path.join(__dirname, "public"))); // Your files are there
+const __dirname = join(dirname(decodeURI(new URL(import.meta.url).pathname))).replace(/^\\([A-Z]:\\)/, "$1");
+app.use(express.static(join(__dirname, "icons"))); // Icons for file types
+app.use(express.static(join(__dirname, "styles"))); // CSS won't work without that
+app.use(express.static(join(__dirname, "public"))); // Your files are there
 
-app.get("/", (req, res) => {
-  const directoryPath = path.join(__dirname, "public");
-  fs.readdir(directoryPath, (err, files) => {
+const servedPath = join(__dirname, "public");
+
+app.get("/:dir?", (req, res) => {
+  let directoryPath = servedPath;
+  if (req.params.dir) {
+    directoryPath = join(servedPath, req.params.dir);
+  }
+  readdir(directoryPath, { withFileTypes: true }, async (err, dirents) => {
     if (err) {
-      res.status(500).send("Error reading directory" + directoryPath);
+      res.status(500).render("500", { error: err, dir: directoryPath });
     } else {
-      // Render the EJS template and pass the file list to it
-      res.render("index", { files: files });
+      // Directories on top
+      const sortedFiles = dirents.sort((a, b) => {
+        if (a.isDirectory() && !b.isDirectory()) {
+          return -1;
+        }
+        if (!a.isDirectory() && b.isDirectory()) {
+          return 1;
+        }
+        return 0;
+      });
+
+      // Add mimeType property to each dirent
+      const filesWithMimeType = await Promise.all( sortedFiles.map(async (dirent) => {
+        const fullPath = join(directoryPath, dirent.name);
+        console.log(fullPath)
+        if (dirent.isDirectory()) {
+            dirent.type = "folder"; // Hate me all you want
+          } else {
+            const buffer = await readChunk(fullPath, {
+              // read the first 4100 bytes of each file starting from 0
+              length: 4100,
+              startPosition: 0,
+            });
+            const typeInfo = await fileTypeFromBuffer(buffer);
+            dirent.type = typeInfo ? typeInfo.mime : "file";
+          }
+        return dirent;
+      }));
+
+      // Render the EJS template and pass the sorted file list to it
+      res.render("index", { files: filesWithMimeType });
+      console.log(filesWithMimeType);
     }
   });
 });
