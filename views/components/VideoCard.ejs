@@ -1,0 +1,21 @@
+<a href="<%= link %>">
+  <div class="max-h-96">
+    <fieldset
+      class="rotate-180 border border-gray-400 rounded-lg hover:border-amber-500 hover:radial-hover-gradient"
+    >
+      <legend
+        class="rotate-180 text-center mx-auto px-1 font-semibold truncate ... max-w-[12rem] pointer-events-none select-none"
+      >
+        <%= name %>
+      </legend>
+        <video
+        class="xl:h-48 lg:h-40 md:h-36 h-32 w-auto m-auto py-1 object-scale-down rotate-180"
+        muted
+        poster="<%= link %>?type=thumbnail"
+        alt="video:<%= link %>"
+        >
+        <source type="<%= mime %>" src="<%= link %>"></source>
+        </video>
+    </fieldset>
+  </div>
+</a>

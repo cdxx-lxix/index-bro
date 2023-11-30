@@ -5,80 +5,26 @@
     <link href="/processed.css" rel="stylesheet" />
   </head>
   <header>
-    <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
-      <div
-        class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl"
-      >
-        <a href="#" class="flex items-center">
-          <span
-            class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
-            >/bro</span
-          >
-        </a>
-        <!-- <div
-          class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1"
-          id="mobile-menu-2"
-        >
-          <ul
-            class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0"
-          >
-            <li>
-              <a
-                href="#"
-                class="block py-2 pr-4 pl-3 text-white rounded bg-primary-700 lg:bg-transparent lg:text-primary-700 lg:p-0 dark:text-white"
-                aria-current="page"
-                >Home</a
-              >
-            </li>
-          </ul>
-        </div> -->
-      </div>
-    </nav>
+    <%- include('components/MainMenu', {}); %>
   </header>
   <main
     class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 p-4"
   >
+    <%- include('components/FileCard', {link: '#', name: '...', src: '/icons8-back.svg', alt: 'back'}); %>
     <% files.forEach(function(file) { %>
       <% if (file.type === 'folder') { %>
-        <a href="<%= file.name %>">
-          <div class="max-h-96">
-            <fieldset
-              class="rotate-180 border border-gray-400 rounded-lg hover:border-amber-500 hover:radial-hover-gradient"
-            >
-              <legend
-                class="rotate-180 text-center mx-auto px-1 font-semibold truncate ... max-w-[12rem] pointer-events-none select-none"
-              >
-                <%= file.name %>
-              </legend>
-              <img
-                class="xl:h-48 lg:h-40 md:h-36 h-32 w-auto m-auto py-1 object-scale-down rotate-180"
-                src="/icons8-folder.svg"
-                alt="<%= file.name %>"
-              />
-            </fieldset>
-          </div>
-        </a>
-      <% }else{ %>
-        <a href="<%= file.name %>">
-          <div class="max-h-96">
-            <fieldset
-              class="rotate-180 border border-gray-400 rounded-lg hover:border-amber-500 hover:radial-hover-gradient"
-            >
-              <legend
-                class="rotate-180 text-center mx-auto px-1 font-semibold truncate ... max-w-[12rem] pointer-events-none select-none"
-              >
-                <%= file.name %>
-              </legend>
-              <img
-                class="xl:h-48 lg:h-40 md:h-36 h-32 w-auto m-auto py-1 object-scale-down rotate-180"
-                src="<%= file.name %>"
-                alt="<%= file.name %>"
-              />
-            </fieldset>
-          </div>
-        </a>
+        <%- include('components/FileCard', {link: file.name, name: file.name, src: '/icons8-folder.svg', alt: 'directory:' + file.name}); %>
+      <% } else if (file.type.includes('image')){ %>
+        <%- include('components/ImageCard', {image: file.name}); %>
+      <% } else if (file.type.includes('video')) { %>
+        <%- include('components/VideoCard', {link: file.name, mime: file.type, name: file.name}); %>
+      <% } else if (file.type.includes('audio')) { %>
+        <%- include('components/FileCard', {link: file.name, name: file.name, src: '/icons8-music.svg', alt: 'audio:' + file.name}); %>
+      <% } else if (file.type.includes('application')) { %>
+        <%- include('components/FileCard', {link: file.name, name: file.name, src: '/icons8-document.svg', alt: 'document:' + file.name}); %>
+      <% } else { %>
+        <%- include('components/FileCard', {link: file.name, name: file.name, src: '/icons8-file.svg', alt: 'file:' + file.name}); %>
       <% } %>
-
 
     <% }); %>
   </main>
