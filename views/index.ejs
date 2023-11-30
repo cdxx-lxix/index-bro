@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Index Bro</title>
-    <link href="/processed.css" rel="stylesheet" />
-  </head>
+  <%- include('components/MetaHead', { title: metaTitle }); %>
   <header>
     <%- include('components/MainMenu', {}); %>
   </header>
   <main
     class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 p-4"
   >
-    <%- include('components/FileCard', {link: '#', name: '...', src: '/icons8-back.svg', alt: 'back'}); %>
+    <% if (currentPath !== '/') { %>
+      <%- include('components/FileCard', {link: '/' + currentPath.split('/').filter(Boolean).slice(0, -1).join('/'), name: '..', src: '/icons8-back.svg', alt: 'back'}); %>
+    <% } %>
     <% files.forEach(function(file) { %>
       <% if (file.type === 'folder') { %>
         <%- include('components/FileCard', {link: file.name, name: file.name, src: '/icons8-folder.svg', alt: 'directory:' + file.name}); %>

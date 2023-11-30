@@ -1,5 +1,6 @@
 {
     "port": 3000,
     "ignore_hidden": true,
-    "blacklist_ext": [".ini", ".sys", ".cfg", ".dll"]
+    "blacklist_ext": [".ini", ".sys", ".cfg", ".dll"],
+    "title": "Index Bro"
 }

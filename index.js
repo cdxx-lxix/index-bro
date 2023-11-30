@@ -16,7 +16,7 @@ app.use(express.static(join(__dirname, "public"))); // Your files are there
 
 const servedPath = join(__dirname, "public");
 
-app.get("/:dir?", (req, res) => {
+app.get("/:dir(*)", (req, res) => {
   let directoryPath = servedPath;
   if (req.params.dir) {
     directoryPath = join(servedPath, req.params.dir);
@@ -39,7 +39,6 @@ app.get("/:dir?", (req, res) => {
       // Add mimeType property to each dirent
       const filesWithMimeType = await Promise.all( sortedFiles.map(async (dirent) => {
         const fullPath = join(directoryPath, dirent.name);
-        console.log(fullPath)
         if (dirent.isDirectory()) {
             dirent.type = "folder"; // Hate me all you want
           } else {
@@ -53,10 +52,8 @@ app.get("/:dir?", (req, res) => {
           }
         return dirent;
       }));
-
       // Render the EJS template and pass the sorted file list to it
-      res.render("index", { files: filesWithMimeType });
-      console.log(filesWithMimeType);
+      res.render("index", { files: filesWithMimeType, metaTitle: config.title, currentPath: req.path });
     }
   });
 });
