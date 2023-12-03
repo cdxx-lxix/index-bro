@@ -71,8 +71,6 @@ const hexToString = (hex) => {
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    console.log("Before: " + req.params.dir) // REMOVE
-    console.log("After: " + hexToString(req.params.dir)) // REMOVE
     let finalDir = servedPath + hexToString(req.params.dir)
     cb(null, finalDir);
   },
