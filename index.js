@@ -1,7 +1,7 @@
 import config from "./config.json" assert { type: "json" };
 import express from "express";
 import { readdir } from "fs";
-import { join, dirname } from "path";
+import { join, dirname, extname } from "path";
 import cors from "cors";
 import { fileTypeFromBuffer } from "file-type";
 import { readChunk } from "read-chunk";
@@ -59,21 +59,33 @@ app.get("/:dir(*)", (req, res) => {
   });
 });
 
+const hexToString = (hex) => {
+  let str = '';
+  for (let i = 0; i < hex.length; i += 2) {
+    const hexValue = hex.substr(i, 2);
+    const decimalValue = parseInt(hexValue, 16);
+    str += String.fromCharCode(decimalValue);
+  }
+  return str;
+};
+
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    const dir = req.body.dir; // Get the current directory from the request body
-    cb(null, dir);
+    console.log("Before: " + req.params.dir) // REMOVE
+    console.log("After: " + hexToString(req.params.dir)) // REMOVE
+    let finalDir = servedPath + hexToString(req.params.dir)
+    cb(null, finalDir);
   },
   filename: function(req, file, cb) {
-      cb(null, path.extname(file.originalname) + Date.now());
+      cb(null, file.originalname);
   }
 });
 
 const upload = multer({ storage: storage });
 
-app.post('/upload', upload.array('file'), (req, res) => {
+app.post('/upload/:dir?', upload.array('files'), (req, res) => {
   console.log("uploaded")
-  res.send('Files uploaded successfully.');
+  // res.json({ message: 'Files uploaded successfully.' });
 });
 
 app.listen(config.port, () =>
