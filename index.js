@@ -5,6 +5,7 @@ import { join, dirname } from "path";
 import cors from "cors";
 import { fileTypeFromBuffer } from "file-type";
 import { readChunk } from "read-chunk";
+import multer from "multer";
 
 const app = express();
 app.use(cors());
@@ -56,6 +57,23 @@ app.get("/:dir(*)", (req, res) => {
       res.render("index", { files: filesWithMimeType, metaTitle: config.title, currentPath: req.path });
     }
   });
+});
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    const dir = req.body.dir; // Get the current directory from the request body
+    cb(null, dir);
+  },
+  filename: function(req, file, cb) {
+      cb(null, path.extname(file.originalname) + Date.now());
+  }
+});
+
+const upload = multer({ storage: storage });
+
+app.post('/upload', upload.array('file'), (req, res) => {
+  console.log("uploaded")
+  res.send('Files uploaded successfully.');
 });
 
 app.listen(config.port, () =>
