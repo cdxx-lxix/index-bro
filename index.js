@@ -1,7 +1,7 @@
 import config from "./config.json" assert { type: "json" };
 import express from "express";
-import { readdir } from "fs";
-import { join, dirname, extname } from "path";
+import { readdir, existsSync, mkdirSync } from "fs";
+import { join, dirname } from "path";
 import cors from "cors";
 import { fileTypeFromBuffer } from "file-type";
 import { readChunk } from "read-chunk";
@@ -81,7 +81,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post('/upload/:dir?', (req, res) => {
+app.post('/upload/:dir', (req, res) => {
   upload.array('files')(req, res, (err) => {
     if (err) {
       res.json({ isUploaded: false, errorMsg: err });
@@ -92,6 +92,16 @@ app.post('/upload/:dir?', (req, res) => {
     }
   });
 });
+
+app.post('/mkdir/:dirname/:dir', (req, res) => {
+  let finalDir = servedPath + hexToString(req.params.dir)
+  if (!existsSync(finalDir + hexToString(req.params.dirname))){
+    mkdirSync(finalDir + hexToString(req.params.dirname));
+    res.json({ isCreated: true });
+  } else {
+    res.json({ isCreated: false, error: "Folder already exists"})
+  }
+})
 
 app.listen(config.port, () =>
   console.log(`Server is listening on port ${config.port}`)

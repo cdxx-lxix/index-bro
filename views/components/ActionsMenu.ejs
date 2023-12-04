@@ -23,7 +23,7 @@
   </div>
 </nav>
 
-  <!-- Main modal -->
+  <!-- Upload modal -->
   <div id="upload-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-2xl max-h-full">
         <!-- Modal content -->
@@ -63,14 +63,49 @@
     </div>
   </div>
 
+   <!-- New Folder modal -->
+   <div id="new-folder-modal" data-modal-backdrop="static" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">
+                    Create a new folder
+                </h3>
+                <button id="new-folder-modal-close" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="new-folder-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <!-- Modal body -->
+            <form id="new-folder-form" method="POST" enctype="multipart/form-data" action="/mkdir" class="p-4">
+              <div class="flex items-center justify-center w-full">
+                <input type="text" maxlength="250" name="folder" id="newfoldername" class="ms-3 text-gray-500 bg-white rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 w-full" />
+                <input type="hidden" id="dir" name="dir" value="<%= currentPath %>">
+              </div>
+              <div class="flex items-center justify-center p-4 md:p-5">
+                <input type="submit" value="Create" class="text-white cursor-pointer bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" />
+                <button id="new-folder-modal-cancel" data-modal-hide="static-modal" type="button" class="ms-3 text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Cancel</button>
+              </div>
+            </form>
+        </div>
+    </div>
+  </div>
+
 <script>
+  // TODO: PORT FROM CONFIG!!!
+  // Upload scripts:
+  // TODO: Progress bar and mime/type exclusion
  const uploadbtn = document.getElementById("uploadbtn")
  const uploadmodal = document.getElementById("upload-modal")
  const uploadmodalclose = document.getElementById("upload-modal-close")
  const filesAmount = document.getElementById("files")
  const filesuploaded = document.getElementById("files-uploaded")
 
- // Function to update filesuploaded.innerText
+ // Function to update info about selected files
  function updateFilesUploaded() {
   filesuploaded.innerText = `Files selected: ${filesAmount.files.length}`
  }
@@ -89,7 +124,6 @@
   updateFilesUploaded() // Call function when modal is closed
  })
 
- // Add event listener to filesAmount
  filesAmount.addEventListener('input', (e) => {
   updateFilesUploaded() // Call function when filesAmount value changes
  })
@@ -104,12 +138,13 @@
   }
     return hex;
   };
-  const form = document.querySelector('form');
-  form.addEventListener('submit', (e) => {
+  const currentDir = document.getElementById("dir").value;
+  let encodedDir = stringToHex(currentDir)
+
+  const uploadForm = document.getElementById("upload-form");
+  uploadForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const files = document.getElementById("files");
-      const currentDir = document.getElementById("dir").value;
-      let encodedDir = stringToHex(currentDir)
       const formData = new FormData();
       for(let i =0; i < files.files.length; i++) {
           formData.append("files", files.files[i]);
@@ -126,6 +161,47 @@
           res.isUploaded = false
         } else {
           window.alert(`Error during upload: ${res.errorMsg}`)
+        }
+      })
+  })
+
+  // Create a new folder scripts: 
+  // TODO: regex name check
+  const newfolderbtn = document.getElementById("newfolderbtn")
+  const newfoldermodal = document.getElementById("new-folder-modal")
+  const newfoldermodalclose = document.getElementById("new-folder-modal-close")
+  const newfoldermodalcancel = document.getElementById("new-folder-modal-cancel")
+  const newfoldername = document.getElementById("newfoldername")
+  const newfolderform = document.getElementById("new-folder-form")
+  newfolderbtn.addEventListener("click", (e) => {
+    newfoldermodal.classList.remove("hidden")
+    newfoldermodal.classList.add("flex")
+    newfoldername.value = ''
+  })
+
+  newfoldermodalclose.addEventListener("click", (e) => {
+    newfoldermodal.classList.remove("flex")
+    newfoldermodal.classList.add("hidden")
+    newfoldername.value = ''
+  })
+  newfoldermodalcancel.addEventListener("click", (e) => {
+    newfoldermodal.classList.remove("flex")
+    newfoldermodal.classList.add("hidden")
+    newfoldername.value = ''
+  })
+  newfolderform.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let encodedNewDirName = stringToHex(newfoldername.value)
+      fetch(`http://localhost:3000/mkdir/${encodedNewDirName}/${encodedDir}`, {
+          method: 'POST'
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.isCreated) {
+          window.alert(`New folder ${newfoldername.value} successfully created`)
+          res.isCreated = false
+        } else {
+          window.alert(`Error during upload: ${res.error}`)
         }
       })
   })
