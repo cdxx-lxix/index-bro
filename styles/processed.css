@@ -666,6 +666,14 @@ video {
   height: calc(100% - 1rem);
 }
 
+.h-4 {
+  height: 1rem;
+}
+
+.h-full {
+  height: 100%;
+}
+
 .max-h-96 {
   max-height: 24rem;
 }
@@ -846,6 +854,16 @@ video {
 
 .bg-transparent {
   background-color: transparent;
+}
+
+.bg-blue-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
+.bg-gray-200 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity));
 }
 
 .object-scale-down {

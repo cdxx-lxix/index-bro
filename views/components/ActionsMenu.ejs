@@ -124,6 +124,8 @@
         if (res.isUploaded) {
           window.alert(`${files.files.length} file(s) successfully uploaded`)
           res.isUploaded = false
+        } else {
+          window.alert(`Error during upload: ${res.errorMsg}`)
         }
       })
   })

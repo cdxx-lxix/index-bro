@@ -81,9 +81,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post('/upload/:dir?', upload.array('files'), (req, res) => {
-  console.log("uploaded")
-  res.json({ isUploaded: true });
+app.post('/upload/:dir?', (req, res) => {
+  upload.array('files')(req, res, (err) => {
+    if (err) {
+      res.json({ isUploaded: false, errorMsg: err });
+      res.end();
+    } else {
+      res.json({ isUploaded: true });
+      res.end();
+    }
+  });
 });
 
 app.listen(config.port, () =>
