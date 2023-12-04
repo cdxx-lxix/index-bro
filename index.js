@@ -83,7 +83,7 @@ const upload = multer({ storage: storage });
 
 app.post('/upload/:dir?', upload.array('files'), (req, res) => {
   console.log("uploaded")
-  // res.json({ message: 'Files uploaded successfully.' });
+  res.json({ isUploaded: true });
 });
 
 app.listen(config.port, () =>

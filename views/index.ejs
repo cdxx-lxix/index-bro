@@ -5,33 +5,7 @@
     <%- include('components/MainMenu', {}); %>
     <%- include('components/ActionsMenu', {}); %>
   </header>
-  <!-- <form id="upload-form" method="POST" enctype="multipart/form-data" action="/upload">
-    <div>
-        <label>Select your files:</label>
-        <input type="file" name="files" id="files" multiple />
-        <input type="hidden" id="dir" name="dir" value="<%= currentPath %>">
-    </div>
-    <div>
-        <input type="submit" value="Upload" />
-    </div>
-</form> -->
-<form id="upload-form" method="POST" enctype="multipart/form-data" action="/upload">
-  <div class="flex items-center justify-center w-full">
-    <label for="files" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed cursor-pointer bg-gray-50">
-        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-            </svg>
-            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-        </div>
-        <input type="file" name="files" id="files" multiple class="hidden" />
-        <input type="hidden" id="dir" name="dir" value="<%= currentPath %>">
-    </label>
-  </div>
-  <div>
-    <input type="submit" value="Upload" />
-</div>
-</form>
+
   <main
     class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 p-4"
   >
@@ -55,37 +29,10 @@
 
     <% }); %>
   </main>
+
   <footer></footer>
 </html>
 
 <script>
-  const stringToHex = (str) => {
-  let hex = '';
-  for (let i = 0; i < str.length; i++) {
-    const charCode = str.charCodeAt(i);
-    const hexValue = charCode.toString(16);
 
-    // Pad with zeros to ensure two-digit representation
-    hex += hexValue.padStart(2, '0');
-  }
-  return hex;
-};
-const form = document.querySelector('form');
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const files = document.getElementById("files");
-    const currentDir = document.getElementById("dir").value;
-    let encodedDir = stringToHex(currentDir)
-    const formData = new FormData();
-    for(let i =0; i < files.files.length; i++) {
-        formData.append("files", files.files[i]);
-        
-    }
-    fetch(`http://localhost:3000/upload/${encodedDir}`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(res => console.log(res))
-})
 </script>
